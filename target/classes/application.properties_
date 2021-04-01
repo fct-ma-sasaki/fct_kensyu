@@ -1,0 +1,8 @@
+spring.mvc.view.prefix: /WEB-INF/jsp/
+spring.mvc.view.suffix: .jsp
+spring.datasource.url=jdbc:mysql://localhost/test20200303_fct
+spring.datasource.username=test20200303_fct
+spring.datasource.password=pass1234
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.initialization-mode=always
+spring.datasource.sql-script-encoding=utf-8

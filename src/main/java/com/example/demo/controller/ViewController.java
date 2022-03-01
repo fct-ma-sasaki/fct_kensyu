@@ -65,10 +65,10 @@ public class ViewController {
         return "redirect:/register";
     }
 
-    @RequestMapping(params = "searchback", method = RequestMethod.POST)
-    String searchBack(SearchForm form, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    @RequestMapping(params = "back", method = RequestMethod.POST)
+    String back(SearchForm form, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
-        form.setMsg("戻りました");
+        //        form.setMsg("戻りました");
         redirectAttributes.addFlashAttribute("searchForm", form);
         return "redirect:/search";
     }

@@ -15,8 +15,6 @@ public class EncordingFilter extends OrderedCharacterEncodingFilter {
             HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         super.setOrder(HIGHEST_PRECEDENCE);
-        //        super.setEncoding("Shift_JIS");
-        //        super.setEncoding("Windows-31J");
         super.setEncoding("utf-8");
         super.setForceEncoding(true);
         super.doFilterInternal(request, response, filterChain);

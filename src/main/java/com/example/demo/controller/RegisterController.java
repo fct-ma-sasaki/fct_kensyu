@@ -51,11 +51,16 @@ public class RegisterController {
     @RequestMapping(params = "register", method = RequestMethod.POST)
     String register(RegisterForm form, SearchForm form1, BindingResult result, Model model,
             RedirectAttributes redirectAttributes) {
-
-        if (form.getRegisterFlg().equals("0")) {
+        if ("".equals(form.getCode())) {
+            form.setMsg("社員コードは必須項目です。");
+            return "Register";
+        }
+        shainInfoDao.registerShainInfo(form);
+        form1 = new SearchForm();
+        if ("0".equals(form.getRegisterFlg())) {
             form1.setMsg("登録が完了しました。");
             redirectAttributes.addFlashAttribute("searchForm", form1);
-        } else if (form.getRegisterFlg().equals("1")) {
+        } else if ("1".equals(form.getRegisterFlg())) {
 
             form1.setMsg("修正が完了しました。");
             redirectAttributes.addFlashAttribute("searchForm", form1);
@@ -64,8 +69,8 @@ public class RegisterController {
         return "redirect:search";
     }
 
-    @RequestMapping(params = "searchback", method = RequestMethod.POST)
-    String init(SearchForm form, BindingResult result, Model model) {
+    @RequestMapping(params = "back", method = RequestMethod.POST)
+    String back(SearchForm form, BindingResult result, Model model) {
         return "redirect:search";
     }
 }

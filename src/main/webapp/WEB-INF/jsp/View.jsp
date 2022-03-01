@@ -3,6 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <link href="css/bootstrap.min.css" rel="stylesheet" >
+<link href="css/style.css" rel="stylesheet" >
 <script type="text/javascript">
 function deleteCheck( code ) {
     if( confirm("社員コード("+code+")削除しますか？") ) {
@@ -19,19 +20,15 @@ function setCode(code){
 	return true ;
 }
 </script>
-<html>
+<html style="margin:50px 50px">
   <head>
     <title>社員情報管理</title>
   </head>
   <body>
-    <h1 class="bg-info">社員情報管理(View.jsp)</h1>
+    <h1 class="bg-info" style="height: 25px; font-size: 20px; margin-bottom: 10px;">社員情報管理(View.jsp)</h1>
     <form:form modelAttribute="viewForm" action="${pageContext.request.contextPath}/view">
-    <td>
-      <button type="submit" name="newRegister" value="newRegister" class="btn btn-primary">新規登録</button>
-    </td>
-
-    <td>
-      <button type="submit" name="searchback" value="searchback" class="btn btn-primary">戻る</button>
+    <td style="margin:10px 10px">
+      <button type="submit" name="newRegister" value="newRegister" class="btn btn-primary" style="margin-bottom: 10px;">新規登録</button>
     </td>
 
     <p></p>
@@ -71,6 +68,9 @@ function setCode(code){
        </c:forEach>
 
      </table>
+    <td style="text-aline:right; margin:10px 10px">
+      <button type="submit" name="back" value="back" class="btn btn-primary">戻る</button>
+    </td>
     <form:input type="hidden" path="code"/>
     </form:form>
   </body>

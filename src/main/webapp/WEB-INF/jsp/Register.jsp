@@ -6,29 +6,31 @@
 <link href="css/style.css" rel="stylesheet" >
 <html style="margin:50px 50px">
   <head>
+    <td>
+      <b><font color="#0000ff"><c:out value="${registerForm.msg}"/></font></b>
+    </td>
     <title >社員登録 </title>
-    <script src="/js/calendar.js" ></script>
   </head>
   <body>
-    <h1 class="bg-info" style="height:30px;vertical-align:center;">社員登録 (Register.jsp)</h1>
+    <h1 class="bg-info" style="height: 25px; font-size: 20px; margin-bottom: 10px;">社員登録 (Register.jsp)</h1>
     <form:form modelAttribute="registerForm" action="${pageContext.request.contextPath}/register" method="post">
     <table>
     <tbody>
-        <tr>
+        <tr style="padding-top: 5px;">
           <td align="right">社員コード：</td>
             <td>
               <form:input path="code" size="9" maxlength="8" />
             </td>
         </tr>
         <tr>
-          <td align="right">氏名：</td>
-          <td>
+          <td style="padding-top: 5px;" align="right">氏名：</td>
+          <td style="padding-top: 5px;">
             <form:input path="meisyouKanji" size="21" maxlength="20" />
           </td>
         </tr>
         <tr>
-          <td  align="right">所属：</td>
-          <td>
+          <td style="padding-top: 5px;" align="right">所属：</td>
+          <td style="padding-top: 5px;">
             <form:select path="shozokuMei">
               <form:option value="">未選択</form:option>
               <form:option value="開発">開発</form:option>
@@ -39,25 +41,20 @@
           </td>
         </tr>
         <tr>
-          <td  align="right">内線：</td>
-          <td>
+          <td style="padding-top: 5px;" align="right">内線：</td>
+          <td style="padding-top: 5px;">
             <form:input path="naisen" size="5" maxlength="4" />
           </td>
         </tr>
         <tr>
-          <th align="right">入社年月日：</th>
-          <td>
+          <th style="padding-top: 5px;" align="right">入社年月日：</th>
+          <td style="padding-top: 5px;">
             <form:input path="nyushaDate" size="12" maxlength="12" style="background:#EEeeEE" />
-              <input name="Calendar" type="button" value="  "style="background-image: url(/images/calendar.gif);
-                     width:20px;
-                     height:20px;
-                     border:0;
-                     cursor:pointer;" onClick="wrtCalendar(event,this.form.nyushaDate,'yyyy/m/d');" />
           </td>
         </tr>
         <tr>
-          <td  align="right" >性別：</td>
-          <td>
+          <td style="padding-top: 5px;" align="right" >性別：</td>
+          <td style="padding-top: 5px;">
             <input type="radio" name="seibetsuMei" value="" checked>未選択
             <input type="radio" name="seibetsuMei" value="男性">男性
             <input type="radio" name="seibetsuMei" value="女性">女性
@@ -67,7 +64,10 @@
     </table>
         <tr>
           <td>
-            <button type="submit" class="btn btn-primary" name="register">登録</button>
+            <button style="margin-top: 10px;" type="submit" class="btn btn-primary" name="register" value="register">登録</button>
+          </td>
+          <td>
+            <button style="margin-top: 10px;" type="submit" class="btn btn-primary" name="back" value="back">キャンセル</button>
           </td>
         </tr>
         <form:hidden path="registerFlg" />

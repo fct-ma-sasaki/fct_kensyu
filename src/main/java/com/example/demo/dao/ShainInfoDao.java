@@ -1,21 +1,15 @@
 package com.example.demo.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.dto.ShainInfoDto;
+import com.example.demo.form.RegisterForm;
 import com.example.demo.form.SearchForm;
 
 @Repository
@@ -27,6 +21,7 @@ public class ShainInfoDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // 検索
     public ArrayList<ShainInfoDto> searchShainInfo(SearchForm searchForm) {
         String selectSql = "SELECT " +
                 "  CIF_OperatorM.Code " +
@@ -98,29 +93,46 @@ public class ShainInfoDao {
             jdbcTemplate.update(deleteSql);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
         }
     }
 
-    public void insertShainInfo(String code) {
+    public void registerShainInfo(RegisterForm form) {
+        String updateSql;
         try {
-            // データベースへの接続を確立
-            String deleteSql = "DELETE " + "FROM CIF_OperatorM " + getWhereString("CIF_OperatorM.Code", code);
-            jdbcTemplate.queryForList(deleteSql);
+            String selectSql = "SELECT * " + "FROM CIF_OperatorM WHERE "
+                    + getWhereString("CIF_OperatorM.Code", form.getCode());
+            List<Map<String, Object>> shainList = jdbcTemplate.queryForList(selectSql);
+            if (shainList.size() != 0) {
+                updateSql = "UPDATE CIF_OperatorM SET "
+                        + "meisyouKanji = '" + form.getMeisyouKanji()
+                        + "', "
+                        + "shozokuMei = '" + form.getShozokuMei()
+                        + "', "
+                        + "seibetsuMei = '" + form.getSeibetsuMei()
+                        + "', "
+                        + "nyushaDate = '" + form.getNyushaDate()
+                        + "', "
+                        + "naisen = '" + form.getNaisen()
+                        + "' WHERE " + getWhereString("Code", form.getCode());
+            } else {
+                String nyusyaDate = "".equals(form.getNyushaDate()) ? null : "'" + form.getNyushaDate() + "'";
+                updateSql = "INSERT INTO CIF_OperatorM (meisyouKanji, shozokuMei, seibetsuMei, nyushaDate, naisen, code) VALUES( '"
+                        + form.getMeisyouKanji()
+                        + "', '"
+                        + form.getShozokuMei()
+                        + "', '"
+                        + form.getSeibetsuMei()
+                        + "', "
+                        + nyusyaDate
+                        + ", '"
+                        + form.getNaisen()
+                        + "', '"
+                        + form.getCode()
+                        + "')";
+            }
+            jdbcTemplate.update(updateSql);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-        }
-    }
-
-    public void updateShainInfo(String code) {
-        try {
-            // データベースへの接続を確立
-            String deleteSql = "DELETE " + "FROM CIF_OperatorM " + getWhereString("CIF_OperatorM.Code", code);
-            jdbcTemplate.queryForList(deleteSql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
         }
     }
 
@@ -159,317 +171,4 @@ public class ShainInfoDao {
         return result;
     }
 
-    // データベースからの出力結果をArrayListオブジェクトに格納
-    public static ArrayList<ShainInfoDto> getShainInfos() {
-        ArrayList<ShainInfoDto> objAry = new ArrayList<ShainInfoDto>();
-        Connection db = null;
-        PreparedStatement objPs = null;
-        ResultSet rs = null;
-        List<Map<String, Object>> list;
-        try {
-            // データベースへの接続を確立
-            Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/SQLjdbc");
-            db = ds.getConnection();
-            objPs = db.prepareStatement("SELECT" + " CIF_OperatorM.Code " + " ,CIF_OperatorM.MeisyouKanji"
-                    + " ,CIF_OperatorM.ShozokuMei" + " ,CIF_OperatorM.SeibetsuMei"
-                    + " ,DATE_FORMAT(CIF_OperatorM.NyushaDate,'%Y/%m/%d') As NyushaDate" + " ,CIF_OperatorM.Naisen "
-                    + "FROM " + "CIF_OperatorM " + "ORDER BY CODE ASC");
-            rs = objPs.executeQuery();
-            // 取得した結果セットをもとに、ShainInfo配列を生成
-            while (rs.next()) {
-                ShainInfoDto objBok = new ShainInfoDto();
-                objBok.setCode(rs.getString("Code"));
-                objBok.setMeisyouKanji(rs.getString("MeisyouKanji"));
-                objBok.setShozokuMei(rs.getString("ShozokuMei"));
-                if ("男".equals(rs.getString("SeibetsuMei"))) {
-                    objBok.setSeibetsuMei("男男男男男男男男");
-                } else if ("女".equals(rs.getString("SeibetsuMei"))) {
-                    objBok.setSeibetsuMei("女女女女女女女女");
-                } else {
-                    objBok.setSeibetsuMei(rs.getString("SeibetsuMei"));
-                }
-                objBok.setNyushaDate(rs.getString("NyushaDate"));
-                objBok.setNaisen(rs.getString("Naisen"));
-                objAry.add(objBok);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (objPs != null) {
-                    objPs.close();
-                }
-                if (db != null) {
-                    db.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return objAry;
-    }
-
-    // 与えられたidに合致するデータをShainInfoオブジェクト
-    // として返します。
-    //    public static ShainInfoDto getShainInfo(String id) {
-    //        Connection db = null;
-    //        PreparedStatement objPs = null;
-    //        ResultSet rs = null;
-    //        ShainInfoDto objBok = new ShainInfoDto();
-    //        try {
-    //            // データベースへの接続を確立
-    //            Context ctx = new InitialContext();
-    //            DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/SQLjdbc");
-    //            db = ds.getConnection();
-    //            objPs = db.prepareStatement("SELECT" + " CIF_OperatorM.Code " + " ,CIF_OperatorM.MeisyouKanji"
-    //                    + " ,CIF_OperatorM.ShozokuMei" + " ,CIF_OperatorM.SeibetsuMei"
-    //                    + " ,DATE_FORMAT(CIF_OperatorM.NyushaDate,'%Y/%m/%d') As NyushaDate" + " ,CIF_OperatorM.Naisen "
-    //                    + "FROM " + "CIF_OperatorM " + " WHERE Code=?");
-    //            objPs.setString(1, id);
-    //            rs = objPs.executeQuery();
-    //            // 取得したデータをShainInfoオブジェクトにセット
-    //            if (rs.next()) {
-    //                objBok.setCode(rs.getString("Code"));
-    //                objBok.setMeisyouKanji(rs.getString("MeisyouKanji"));
-    //                objBok.setShozokuMei(rs.getString("ShozokuMei"));
-    //                objBok.setSeibetsuMei(rs.getString("SeibetsuMei"));
-    //                objBok.setNyushaDate(rs.getString("NyushaDate"));
-    //                objBok.setNaisen(rs.getString("Naisen"));
-    //            }
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //        } finally {
-    //            try {
-    //                if (rs != null) {
-    //                    rs.close();
-    //                }
-    //                if (objPs != null) {
-    //                    objPs.close();
-    //                }
-    //                if (db != null) {
-    //                    db.close();
-    //                }
-    //            } catch (Exception e) {
-    //                e.printStackTrace();
-    //            }
-    //        }
-    //        return objBok;
-    //    }
-
-    //    public static void deleteShainInfo(String id) {
-    //        Connection db = null;
-    //        PreparedStatement objPs = null;
-    //        try {
-    //            // データベースへの接続を確立
-    //            Context ctx = new InitialContext();
-    //            DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/SQLjdbc");
-    //            db = ds.getConnection();
-    //            objPs = db.prepareStatement("DELETE " + "FROM CIF_OperatorM " + "WHERE Code=? ");
-    //            objPs.setString(1, id);
-    //            objPs.executeUpdate();
-    //            // 取得したデータをShainInfoオブジェクトにセット
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //        } finally {
-    //            try {
-    //                if (objPs != null) {
-    //                    objPs.close();
-    //                }
-    //                if (db != null) {
-    //                    db.close();
-    //                }
-    //            } catch (Exception e) {
-    //                e.printStackTrace();
-    //            }
-    //        }
-    //    }
-
-    public String updateShainInfo(ShainInfoDto shainInfoDto) {
-        String result = new String();
-        Connection db = null;
-        PreparedStatement objPs1 = null;
-        PreparedStatement objPs2 = null;
-        try {
-            Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/SQLjdbc");
-            db = ds.getConnection();
-            objPs1 = db.prepareStatement("SELECT * FROM CIF_OperatorM WHERE code=?");
-            objPs1.setString(1, shainInfoDto.getCode());
-            ResultSet rs = objPs1.executeQuery();
-            if (rs.next()) {
-                objPs2 = db.prepareStatement(
-                        "UPDATE CIF_OperatorM SET meisyouKanji=?, shozokuMei=?, seibetsuMei=?, nyushaDate=?, naisen=? WHERE code=?");
-                result = "2";
-            } else {
-                objPs2 = db.prepareStatement(
-                        "INSERT INTO CIF_OperatorM (meisyouKanji, shozokuMei, seibetsuMei, nyushaDate, naisen, code) VALUES(?,?,?,?,?,?)");
-                result = "1";
-            }
-            objPs2.setString(1, shainInfoDto.getMeisyouKanji());
-            objPs2.setString(2, shainInfoDto.getShozokuMei());
-            objPs2.setString(3, shainInfoDto.getSeibetsuMei());
-            objPs2.setString(4, shainInfoDto.getNyushaDate());
-            objPs2.setString(5, shainInfoDto.getNaisen());
-            objPs2.setString(6, shainInfoDto.getCode());
-            objPs2.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (objPs1 != null) {
-                    objPs1.close();
-                }
-                if (objPs2 != null) {
-                    objPs2.close();
-                }
-                if (db != null) {
-                    db.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
-
-    //    public static ArrayList<ShainInfoDto> searchShainInfo(SearchForm searchForm) {
-    //        ArrayList<ShainInfoDto> objAry = new ArrayList<ShainInfoDto>();
-    //        Connection db = null;
-    //        PreparedStatement objPs = null;
-    //        ResultSet rs = null;
-    //        try {
-    //            // データベースへの接続を確立
-    //            Context ctx = new InitialContext();
-    //            DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/SQLjdbc");
-    //            db = ds.getConnection();
-    //            String selectSql = "SELECT " +
-    //                    "  CIF_OperatorM.Code " +
-    //                    " ,CIF_OperatorM.MeisyouKanji " +
-    //                    " ,CIF_OperatorM.ShozokuMei " +
-    //                    " ,CIF_OperatorM.SeibetsuMei " +
-    //                    " ,DATE_FORMAT(CIF_OperatorM.NyushaDate,'%Y/%m/%d') As NyushaDate " +
-    //                    " ,CIF_OperatorM.Naisen " +
-    //                    "FROM " +
-    //                    "  CIF_OperatorM ";
-    //
-    //            String whereString = "";
-    //            whereString = getAnd(new String[] { getWhereString("CIF_OperatorM.Code", searchForm.getCode()),
-    //                    getWhereString("CIF_OperatorM.MeisyouKanji", searchForm.getMeisyouKanji()),
-    //                    getWhereString("CIF_OperatorM.ShozokuMei", searchForm.getShozokuMei()),
-    //                    getWhereString("CIF_OperatorM.SeibetsuMei", searchForm.getSeibetsuMei()),
-    //                    getWhereString("CIF_OperatorM.Naisen", searchForm.getNaisen()) });
-    //            if (!"".equals(whereString)) {
-    //                selectSql = selectSql + " WHERE " + whereString;
-    //            }
-    //            selectSql = selectSql + "ORDER BY CODE ASC";
-    //
-    //            objPs = db.prepareStatement(selectSql);
-    //            rs = objPs.executeQuery();
-    //            // 取得した結果セットをもとに、ShainInfo配列を生成
-    //            while (rs.next()) {
-    //                ShainInfoDto objBok = new ShainInfoDto();
-    //                objBok.setCode(rs.getString("Code"));
-    //                objBok.setMeisyouKanji(rs.getString("MeisyouKanji"));
-    //                objBok.setShozokuMei(rs.getString("ShozokuMei"));
-    //                if ("男".equals(rs.getString("SeibetsuMei"))) {
-    //                    objBok.setSeibetsuMei("男性");
-    //                } else if ("女".equals(rs.getString("SeibetsuMei"))) {
-    //                    objBok.setSeibetsuMei("女性");
-    //                } else {
-    //                    objBok.setSeibetsuMei(rs.getString("SeibetsuMei"));
-    //                }
-    //                objBok.setNyushaDate(rs.getString("NyushaDate"));
-    //                objBok.setNaisen(rs.getString("Naisen"));
-    //                objAry.add(objBok);
-    //            }
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //        } finally {
-    //            try {
-    //                if (rs != null) {
-    //                    rs.close();
-    //                }
-    //                if (objPs != null) {
-    //                    objPs.close();
-    //                }
-    //                if (db != null) {
-    //                    db.close();
-    //                }
-    //            } catch (Exception e) {
-    //                e.printStackTrace();
-    //            }
-    //        }
-    //        return objAry;
-    //    }
-    //    public static ArrayList<ShainInfoDto> searchShainInfo(SearchForm searchForm) {
-    //        ArrayList<ShainInfoDto> objAry = new ArrayList<ShainInfoDto>();
-    //        Connection db = null;
-    //        PreparedStatement objPs = null;
-    //        ResultSet rs = null;
-    //        List<Map<String, Object>> list;
-    //        try {
-    //            // データベースへの接続を確立
-    //            String selectSql = "SELECT " +
-    //                    "  CIF_OperatorM.Code " +
-    //                    " ,CIF_OperatorM.MeisyouKanji " +
-    //                    " ,CIF_OperatorM.ShozokuMei " +
-    //                    " ,CIF_OperatorM.SeibetsuMei " +
-    //                    " ,DATE_FORMAT(CIF_OperatorM.NyushaDate,'%Y/%m/%d') As NyushaDate " +
-    //                    " ,CIF_OperatorM.Naisen " +
-    //                    "FROM " +
-    //                    "  CIF_OperatorM ";
-    //
-    //            String whereString = "";
-    //            whereString = getAnd(new String[] { getWhereString("CIF_OperatorM.Code", searchForm.getCode()),
-    //                    getWhereString("CIF_OperatorM.MeisyouKanji", searchForm.getMeisyouKanji()),
-    //                    getWhereString("CIF_OperatorM.ShozokuMei", searchForm.getShozokuMei()),
-    //                    getWhereString("CIF_OperatorM.SeibetsuMei", searchForm.getSeibetsuMei()),
-    //                    getWhereString("CIF_OperatorM.Naisen", searchForm.getNaisen()) });
-    //            if (!"".equals(whereString)) {
-    //                selectSql = selectSql + " WHERE " + whereString;
-    //            }
-    //            selectSql = selectSql + "ORDER BY CODE ASC";
-    //
-    //            jdbcTemplate.queryForList(selectSql);
-    //
-    //            // 取得した結果セットをもとに、ShainInfo配列を生成
-    //            while (rs.next()) {
-    //                ShainInfoDto objBok = new ShainInfoDto();
-    //                objBok.setCode(rs.getString("Code"));
-    //                objBok.setMeisyouKanji(rs.getString("MeisyouKanji"));
-    //                objBok.setShozokuMei(rs.getString("ShozokuMei"));
-    //                if ("男".equals(rs.getString("SeibetsuMei"))) {
-    //                    objBok.setSeibetsuMei("男性");
-    //                } else if ("女".equals(rs.getString("SeibetsuMei"))) {
-    //                    objBok.setSeibetsuMei("女性");
-    //                } else {
-    //                    objBok.setSeibetsuMei(rs.getString("SeibetsuMei"));
-    //                }
-    //                objBok.setNyushaDate(rs.getString("NyushaDate"));
-    //                objBok.setNaisen(rs.getString("Naisen"));
-    //                objAry.add(objBok);
-    //            }
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //        } finally {
-    //            try {
-    //                if (rs != null) {
-    //                    rs.close();
-    //                }
-    //                if (objPs != null) {
-    //                    objPs.close();
-    //                }
-    //                if (db != null) {
-    //                    db.close();
-    //                }
-    //            } catch (Exception e) {
-    //                e.printStackTrace();
-    //            }
-    //        }
-    //        return objAry;
-    //    }
 }

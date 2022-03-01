@@ -41,6 +41,11 @@ public class SearchController {
 
     @RequestMapping
     String init(SearchForm form, BindingResult result, Model model) {
+        form.setCode(null);
+        form.setMeisyouKanji(null);
+        form.setSeibetsuMei(null);
+        form.setShozokuMei(null);
+        form.setNaisen(null);
         return "Search";
     }
 
@@ -50,6 +55,7 @@ public class SearchController {
         ArrayList<ShainInfoDto> shainInfoDto = shainInfoDao.searchShainInfo(form);
 
         if (shainInfoDto == null || shainInfoDto.size() == 0) {
+            form.setMsg("該当データが存在しません。");
             return "Search";
         }
         redirectAttributes.addFlashAttribute("searchForm", form);

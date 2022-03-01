@@ -9,6 +9,7 @@ public class RegisterForm {
     private String nyushaDate;
     private String naisen;
     private String registerFlg;
+    private String msg;
 
     // プロパティ参照用のgetterメソッド
     public String getCode() {
@@ -39,6 +40,10 @@ public class RegisterForm {
         return registerFlg;
     }
 
+    public String getMsg() {
+        return msg;
+    }
+
     // プロパティ設定用のsetterメソッド
     public void setCode(String code) {
         this.code = code;
@@ -66,6 +71,10 @@ public class RegisterForm {
 
     public void setRegisterFlg(String registerFlg) {
         this.registerFlg = registerFlg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
 }

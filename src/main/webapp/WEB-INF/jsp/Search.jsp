@@ -12,25 +12,26 @@
     <title >社員検索 </title>
   </head>
   <body>
-    <h1 class="bg-info" style="height:30px;vertical-align:center;">社員検索 (Search.jsp)</h1>
+    <h1 class="bg-info" style="height: 25px; font-size: 20px; margin-bottom: 10px;">社員検索 (Search.jsp)</h1>
     <form:form modelAttribute="searchForm" action="${pageContext.request.contextPath}/search" method="post">
     <table>
+
     <tbody>
-        <tr>
-          <td align="right">社員コード：</td>
-            <td>
+        <tr style="padding-top: 10px;">
+          <td style="padding-top: 5px;" align="right">社員コード：</td>
+            <td style="padding-top: 5px;">
               <form:input path="code" size="9" maxlength="8" />
             </td>
         </tr>
         <tr>
-          <td align="right">氏名：</td>
-          <td>
+          <td style="padding-top: 5px;" align="right">氏名：</td>
+          <td style="padding-top: 5px;">
             <form:input path="meisyouKanji" size="21" maxlength="20" />
           </td>
         </tr>
         <tr>
-          <td  align="right">所属：</td>
-          <td>
+          <td style="padding-top: 5px;" align="right">所属：</td>
+          <td style="padding-top: 5px;">
             <form:select path="shozokuMei">
               <form:option value="">未選択</form:option>
               <form:option value="開発">開発</form:option>
@@ -41,14 +42,14 @@
           </td>
         </tr>
         <tr>
-          <td  align="right">内線：</td>
-          <td>
+          <td style="padding-top: 5px;" align="right">内線：</td>
+          <td style="padding-top: 5px;">
             <form:input path="naisen" size="5" maxlength="4" />
           </td>
         </tr>
         <tr>
-          <td  align="right" >性別：</td>
-          <td>
+          <td style="padding-top: 5px;" align="right" >性別：</td>
+          <td style="padding-top: 5px;">
             <input type="radio" name="seibetsuMei" value="" checked>未選択
             <input type="radio" name="seibetsuMei" value="男性">男性
             <input type="radio" name="seibetsuMei" value="女性">女性
@@ -58,8 +59,8 @@
     </table>
         <tr>
           <td>
-            <button type="submit" class="btn btn-primary" name="search">検索</button>
-            <button type="submit" name="newRegister" value="newRegister" class="btn btn-primary">新規登録</button>
+            <button style="margin-top: 10px;" type="submit" class="btn btn-primary" name="search">検索</button>
+            <button style="margin-top: 10px;" type="submit" name="newRegister" value="newRegister" class="btn btn-primary">新規登録</button>
           </td>
         </tr>
     </form:form>
